@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-CONF_DIR=`pwd`
+THIS_DIR=$(cd $(dirname $0); pwd)
 
 echo "Checking FreeBSD Updates..."
 freebsd-update fetch install
@@ -14,9 +14,9 @@ if [ $HAS_VBOX ]; then
 	echo "Installing VBox Guest..."
 	pkg install -y virtualbox-ose-additions
 	echo "Adding VBox Guest Services..."
-	cat $CONF_DIR/rc-vbox.conf >> /etc/rc.conf
+	cat $THIS_DIR/rc-vbox.conf >> /etc/rc.conf
 	echo "Coping VBox conf settings..."
-	cat $CONF_DIR/loader-vbox.conf >> /boot/loader.conf
+	cat $THIS_DIR/loader-vbox.conf >> /boot/loader.conf
 else
 	echo "VBox not found."
 fi
@@ -25,21 +25,21 @@ echo "Installing Port Management Tools and Shells..."
 pkg install -y portmaster portupgrade sudo git bash
 
 echo "Installing Development Tools..."
-pkg install -y R cmake gawk gcc gmake lua53 octave sox
+pkg install -y R cmake gawk gcc gmake lua53 octave
 
 read -p "Select Destktop Environments [Mate/Openbox/Xfce]?" deopt </dev/tty
 case "$deopt" in
-  m|M) echo "Mate is selected."
-	DE_OPT=mate
-    ;;
-  o|O) echo "Openbox is selected."
-	DE_OPT=openbox
-    ;;
-  x|X) echo "Xfce is selected."
-	DE_OPT=xfce
-    ;;
-  *) echo "Skip to install."
-    ;;
+	m|M) echo "Mate is selected."
+		DE_OPT=mate
+		;;
+	o|O) echo "Openbox is selected."
+		DE_OPT=openbox
+		;;
+	x|X) echo "Xfce is selected."
+		DE_OPT=xfce
+		;;
+	*) echo "Skip to install Destktop Environments."
+		;;
 esac
 
 if [ $DE_OPT ]; then
@@ -50,7 +50,7 @@ fi
 
 if [ $DE_INSTALLED ]; then
 	echo "Adding Destktop Environment Services..."
-	cat $CONF_DIR/rc-de.conf >> /etc/rc.conf
+	cat $THIS_DIR/rc-de.conf >> /etc/rc.conf
 
 	echo "Adding Login Manager..."
 	if [ $DE_OPT == "mate" ]; then
@@ -66,13 +66,13 @@ if [ $DE_INSTALLED ]; then
 fi
 
 echo "Coping /boot/loader.conf Tunings..."
-cat $CONF_DIR/loader-tuning.conf >> /boot/loader.conf
+cat $THIS_DIR/loader-tuning.conf >> /boot/loader.conf
 
 echo "Coping /etc/sysctl.conf Tunings..."
-cat $CONF_DIR/sysctl-tuning.conf >> /etc/sysctl.conf
+cat $THIS_DIR/sysctl-tuning.conf >> /etc/sysctl.conf
 
 echo "Toggling Other Services..."
-cat $CONF_DIR/rc-misc.conf >> /etc/rc.conf
+cat $THIS_DIR/rc-misc.conf >> /etc/rc.conf
 
 ARCH=`uname -m`
 echo "Installing Linux Services..."
@@ -80,16 +80,18 @@ kldload linux
 kldstat
 if [ $ARCH == "amd64" ]; then
 	echo "Coping /etc/make.conf c6_64 settings..."
-	cat $CONF_DIR/make-linux64.conf >> /etc/make.conf
-	cd /usr/ports/emulators/linux-c6 && make config-recursive && make install
-	#portmaster -PP linux-c6
+	cat $THIS_DIR/make-linux64.conf >> /etc/make.conf
+	cd /usr/ports/emulators/linux-c6 && make config-recursive
+	portmaster -PP emulators/linux-c6
 else
 	pkg install -y linux-c6
 fi
 
 if [ -d "/compat/linux" ]; then
 	echo "Adding Linux Services..."
-	cat $CONF_DIR/rc-linux.conf >> /etc/rc.conf
+	echo '' >> /etc/rc.conf
+	echo '# Linux Services' >> /etc/rc.conf
+	echo 'linux_enable="YES"' >> /etc/rc.conf
 	if [ $ARCH == "amd64" ]; then
 		echo 'linux64_enable="YES"' >> /etc/rc.conf
 	fi
@@ -101,4 +103,4 @@ echo "Installing NetworkMgr..."
 cd /tmp/ghostbsd-ports/net-mgmt/networkmgr && make install
 
 echo "Completed."
-cd $CONF_DIR
+cd $THIS_DIR
