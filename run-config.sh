@@ -25,7 +25,8 @@ echo "Installing Port Management Tools and Shells..."
 pkg install -y portmaster portupgrade sudo git bash
 
 echo "Installing Development Tools..."
-pkg install -y R cmake gawk gcc gmake lua53 octave
+pkg install -y R cmake gawk gcc gmake lua53
+pkg install -y octave || echo "ERROR: use portmaster -PP math/octave to install"
 
 read -p "Select Destktop Environments [Mate/Openbox/Xfce]?" deopt </dev/tty
 case "$deopt" in
@@ -62,7 +63,7 @@ if [ $DE_INSTALLED ]; then
 	fi
 
 	echo "Installing Desktop Applications..."
-	pkg install -y cursor-dmz-theme setxkbmap xrandr dpkg fusefs-ntfs fusefs-ext4fuse py27-gobject py27-webkitgtk py27-pexpect py27-python-distutils-extra rsync gksu octopkg transmission dconf-editor firefox firefox-i18n geany
+	pkg install -y cursor-dmz-theme setxkbmap xrandr dpkg fusefs-ntfs fusefs-ext4fuse py27-gobject py27-webkitgtk py27-pexpect py27-python-distutils-extra rsync gksu octopkg transmission dconf-editor firefox firefox-i18n geany filezilla
 fi
 
 echo "Coping /boot/loader.conf Tunings..."
@@ -95,6 +96,7 @@ if [ -d "/compat/linux" ]; then
 	if [ $ARCH == "amd64" ]; then
 		echo 'linux64_enable="YES"' >> /etc/rc.conf
 	fi
+	cat $THIS_DIR/fstab-linux >> /etc/fstab
 fi
 
 echo "Installing GhostBSD Ports..."
