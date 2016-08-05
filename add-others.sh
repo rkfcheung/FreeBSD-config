@@ -131,10 +131,7 @@ case "$yn" in
 		fetch $RS_GH
 		cp $RS_TGZ "v${RS_VER}.tar.gz"
 		echo "RStudio is installing..."
-		cd ${RS_DIR} && make install
-		#cd ${RS_DIR}/work/rstudio-${RS_VER}src/cpp/core/r_util
-		#cp RTokenizer.cpp RTokenizer-bak.cpp
-		#fetch https://raw.githubusercontent.com/rstudio/rstudio/master/src/cpp/core/r_util/RTokenizer.cpp
+		cd ${RS_DIR} && make installl
 		;;
 	*) echo "Skip to install RStudio."
 		;;
