@@ -13,14 +13,14 @@
     check_function_exists(getpeereid HAVE_GETPEEREID)
     check_function_exists(setresuid HAVE_SETRESUID)
     if(EXISTS "/proc/self")
-@@ -155,6 +161,10 @@
+@@ -154,6 +160,10 @@
+       ${ZLIB_LIBRARIES}
        ${CORE_SERVICES_LIBRARY}
     )
- 
++
 +   if(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
 +     set(CORE_SYSTEM_LIBRARIES ${CORE_SYSTEM_LIBRARIES} ${INOTIFY_LIBRARIES})
 +   endif()
-+
+
     if(RSTUDIO_SERVER)
        find_package(OpenSSL REQUIRED QUIET)
-       find_package(PAM REQUIRED)

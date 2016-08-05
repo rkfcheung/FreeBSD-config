@@ -8,4 +8,3 @@
 +#if !defined(_WIN32) && !defined(__APPLE__) && !defined(__FreeBSD__) && !defined(__STDC_ISO_10646__)
     #error "wchar_t is not Unicode"
  #endif
- 
