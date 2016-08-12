@@ -1,26 +1,29 @@
 #!/usr/bin/env sh
 
 THIS_DIR=$(cd $(dirname $0); pwd)
-
-echo "Checking FreeBSD Updates..."
-freebsd-update fetch install
-portsnap fetch extract update
+BSD_NAME=`uname`
+if [ "$BSD_NAME" == "FreeBSD" ]; then
+	echo "Checking FreeBSD Updates..."
+	freebsd-update fetch install
+	portsnap fetch extract update
+fi
 pkg update -f
 pkg upgrade -y
 
-HAS_VBOX=`dmesg | grep VBOX | wc -l`
-if [ $HAS_VBOX ]; then
-	echo "VBox found."
-	echo "Installing VBox Guest..."
-	pkg install -y virtualbox-ose-additions
-	echo "Adding VBox Guest Services..."
-	cat $THIS_DIR/rc-vbox.conf >> /etc/rc.conf
-	echo "Coping VBox conf settings..."
-	cat $THIS_DIR/loader-vbox.conf >> /boot/loader.conf
-else
-	echo "VBox not found."
+if [ "$BSD_NAME" == "FreeBSD" ]; then
+	HAS_VBOX=`dmesg | grep VBOX | wc -l`
+	if [ $HAS_VBOX ]; then
+		echo "VBox found."
+		echo "Installing VBox Guest..."
+		pkg install -y virtualbox-ose-additions
+		echo "Adding VBox Guest Services..."
+		cat $THIS_DIR/rc-vbox.conf >> /etc/rc.conf
+		echo "Copying VBox conf settings..."
+		cat $THIS_DIR/loader-vbox.conf >> /boot/loader.conf
+	else
+		echo "VBox not found."
+	fi
 fi
-
 echo "Installing Port Management Tools and Shells..."
 pkg install -y portmaster portupgrade sudo git bash
 
@@ -66,26 +69,30 @@ if [ $DE_INSTALLED ]; then
 	pkg install -y cursor-dmz-theme setxkbmap xrandr dpkg fusefs-ntfs fusefs-ext4fuse py27-gobject py27-webkitgtk py27-pexpect py27-python-distutils-extra rsync gksu octopkg transmission dconf-editor firefox firefox-i18n geany filezilla
 fi
 
-echo "Coping /boot/loader.conf Tunings..."
+echo "Copying /boot/loader.conf Tunings..."
 cat $THIS_DIR/loader-tuning.conf >> /boot/loader.conf
 
-echo "Coping /etc/sysctl.conf Tunings..."
-cat $THIS_DIR/sysctl-tuning.conf >> /etc/sysctl.conf
+if [ "$BSD_NAME" == "FreeBSD" ]; then
+	echo "Copying /etc/sysctl.conf Tunings..."
+	cat $THIS_DIR/sysctl-tuning.conf >> /etc/sysctl.conf
+fi
 
 echo "Toggling Other Services..."
 cat $THIS_DIR/rc-misc.conf >> /etc/rc.conf
 
 ARCH=`uname -m`
-echo "Installing Linux Services..."
-kldload linux
-kldstat
-if [ $ARCH == "amd64" ]; then
-	echo "Coping /etc/make.conf c6_64 settings..."
-	cat $THIS_DIR/make-linux64.conf >> /etc/make.conf
-	cd /usr/ports/emulators/linux-c6 && make config-recursive
-	portmaster -PP emulators/linux-c6
-else
-	pkg install -y linux-c6
+if [ "$BSD_NAME" == "FreeBSD" ]; then
+	echo "Installing Linux Services..."
+	kldload linux
+	kldstat
+	if [ $ARCH == "amd64" ]; then
+		echo "Copying /etc/make.conf c6_64 settings..."
+		cat $THIS_DIR/make-linux64.conf >> /etc/make.conf
+		cd /usr/ports/emulators/linux-c6 && make config-recursive
+		portmaster -PP emulators/linux-c6
+	else
+		pkg install -y linux-c6
+	fi
 fi
 
 if [ -d "/compat/linux" ]; then
