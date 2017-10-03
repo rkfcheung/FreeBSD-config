@@ -3,7 +3,7 @@
 THIS_DIR=$(cd $(dirname $0); pwd)
 BSD_NAME=`uname`
 if [ "$BSD_NAME" == "FreeBSD" ]; then
-  echo "Checking FreeBSD Updates..."
+	echo "Checking FreeBSD Updates..."
 	freebsd-update fetch install
 fi
 
@@ -16,6 +16,12 @@ pkg install -y sudo git
 
 echo "Installing MATE Desktop..."
 pkg install -y xorg slim mate
+echo "Adding Destktop Environment Services..."
+echo "" >> /etc/rc.conf
+echo "# Desktop Environment Services" >> /etc/rc.conf
+echo 'dbus_enable="YES"' >> /etc/rc.conf
+echo 'hald_enable="YES"' >> /etc/rc.conf
+echo 'slim_enable="YES"' >> /etc/rc.conf
 echo "exec /usr/local/bin/mate-session" > ~/.xinitrc
 
 echo "Installing Desktop Applications..."
