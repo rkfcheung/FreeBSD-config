@@ -28,4 +28,4 @@ echo "Installing Desktop Applications..."
 pkg install -y cursor-dmz-theme setxkbmap xrandr dpkg fusefs-ntfs fusefs-ext4fuse
 pkg install -y py27-gobject py27-webkitgtk py27-pexpect py27-python-distutils-extra
 pkg install -y grsync gksu octopkg networkmgr transmission firefox firefox-i18n geany filezilla
-pkg install -y droid-fonts-ttf x11-fonts/wqy chinese/fcitx
+pkg install -y droid-fonts-ttf chinese/fcitx zh-fcitx-configtool chinese/fcitx-chewing
